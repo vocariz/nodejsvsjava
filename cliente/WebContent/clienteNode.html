@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Cliente de pruebas</title>
+<!-- https://www.bootstrapcdn.com/ -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div id="form">
+			<h2>Request</h2>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label for="iUrl" class="col-sm-4 control-label">URL service</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" id="iUrl" placeholder="URL" value="http://localhost:3000/1.0.0/nodejsRest/" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="iNumRequests" class="col-sm-4 control-label">Num. of Requests</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" id="iNumRequests" placeholder="10" value="10" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="iSeconds" class="col-sm-4 control-label">Stop after X seconds</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" id="iSeconds" placeholder="10" value="0" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="iDelayMs" class="col-sm-4 control-label">Delay (in ms)</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" id="iDelayMs" placeholder="1000" value="1000" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-4 col-sm-8">
+						<div class="checkbox">
+							<label><input type="checkbox" id="cVerbose" checked="checked" />Verbose the response</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-4 col-sm-8">
+						<button type="button" id="btnStart" class="btn btn-info">Start test</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div id="response">
+			<h2>
+				Response
+				<button type="button" id="btnClear" class="btn btn-primary">Clear response</button>
+			</h2>
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Response ID</th>
+							<th>Elapsed time(ms)</th>
+						</tr>
+					</thead>
+					<tbody id="results">
+						<tr>
+							<th scope="row">1</th>
+							<td>2</td>
+							<td>Test</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- https://developers.google.com/speed/libraries/#jquery -->
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<!-- https://www.bootstrapcdn.com/ -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+		var requestId = 1;
+		var testClient = {
+			init : function() {
+				$('#btnStart').on('click', this.startRequests);
+				$('#btnClear').on('click', this.clearResponse);
+			},
+			startRequests : function() {
+				var url = $('#iUrl').val();
+				var numRequests = $('#iNumRequests').val();
+				var msDelay = $('#iDelayMs').val();
+				var cVerbose = $('#cVerbose').is(':checked');
+				if (cVerbose) {
+					prepareRows(numRequests);
+				}
+				var fullUrl;
+				for (var i = 1; i <= numRequests; i++) {
+					fullUrl = url + '?reqId='+requestId + '&delay=' + msDelay
+					requestId = requestId + 1;
+					var startTime = new Date();
+					$.ajax(fullUrl, {
+						type : 'GET',
+						success : function(data, status) {
+							if (cVerbose) {
+								var id = "#resp" + data.requestId;
+								var endTime = new Date();
+								$(id).text("Done in " + (endTime - startTime) + " ms");
+							}
+						}
+					});
+				}
+			},
+			clearResponse : function() {
+				var tableBody = $('#results');
+				tableBody.empty();
+				requestId = 1;
+			},
+		};
+		function prepareRows(numRows) {
+			var tableBody = $('#results');
+			var i = 0;
+			while (i < numRows) {
+				newId = requestId + (i++)
+				$('<tr><th scope="row">' + newId + '</th><td>' + i + '</td><td id="resp'+newId+'">Waiting</td></tr>') .appendTo(tableBody);
+			}
+		}
+		$(document).ready(function() {
+			console.log('ready');
+			testClient.init();
+		});
+	</script>
+</body>
+</html>

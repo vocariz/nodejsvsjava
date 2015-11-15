@@ -1,0 +1,13 @@
+{
+  "name": "nodejs-rest-service",
+  "version": "1.0.0",
+  "description": "NODEJS API REST",
+  "main": "index.js",
+  "author": "Victor Ocariz",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "method-override": "^2.3.5"
+  }
+}
